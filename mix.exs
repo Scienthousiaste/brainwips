@@ -49,6 +49,7 @@ defmodule Brainwips.MixProject do
       {:gettext, "~> 0.20"},
       {:jason, "~> 1.2"},
       {:dns_cluster, "~> 0.1.1"},
+      {:dart_sass, "~> 0.5", runtime: Mix.env() == :dev},
       {:plug_cowboy, "~> 2.5"}
     ]
   end
@@ -67,7 +68,7 @@ defmodule Brainwips.MixProject do
       test: ["ecto.create --quiet", "ecto.migrate --quiet", "test"],
       "assets.setup": ["esbuild.install --if-missing"],
       "assets.build": ["esbuild default"],
-      "assets.deploy": ["esbuild default --minify", "phx.digest"]
+      "assets.deploy": ["esbuild default --minify", "sass default --no-source-map --style=compressed", "phx.digest"]
     ]
   end
 end

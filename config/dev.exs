@@ -25,7 +25,12 @@ config :brainwips, BrainwipsWeb.Endpoint,
   debug_errors: true,
   secret_key_base: "plZvmZ8AA3pThPkAVOjEGNqToz7LjOqaqpKW38BHWLkfwFM0q5wavmqNjK4WF4FA",
   watchers: [
-    esbuild: {Esbuild, :install_and_run, [:default, ~w(--sourcemap=inline --watch)]}
+    esbuild: {Esbuild, :install_and_run, [:default, ~w(--sourcemap=inline --watch)]},
+    sass: {
+      DartSass,
+      :install_and_run,
+      [:default, ~w(--embed-source-map --source-map-urls=absolute --watch)]
+    }
   ]
 
 # ## SSL Support
@@ -79,3 +84,10 @@ config :phoenix_live_view, :debug_heex_annotations, true
 
 # Disable swoosh api client as it is only required for production adapters.
 config :swoosh, :api_client, false
+
+config :dart_sass,
+  version: "1.61.0",
+  default: [
+    args: ~w(css/app.scss ../priv/static/assets/app.css),
+    cd: Path.expand("../assets", __DIR__)
+  ]
