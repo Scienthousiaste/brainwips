@@ -1,0 +1,12 @@
+@import "../utils/variables.scss";
+
+body {
+    min-height: 100vh;
+    font-size: 18px;
+    font-family: 'Quicksand', 'sans-serif';
+    color: #555;
+    background-color: $pastel-yellow;
+    * {
+        background-color: white;
+    }
+}

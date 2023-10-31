@@ -1,4 +1,11 @@
 main {
-  margin: 0 auto;
+  margin: 50px auto;
+  padding: 50px;
   max-width: 50em;
+  border: 2px solid;
+  border-radius: 30px;
+}
+
+.introduction {
+  font-size: 22px;
 }
