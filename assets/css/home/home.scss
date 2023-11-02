@@ -1,11 +1,16 @@
-main {
-  margin: 50px auto;
-  padding: 50px;
-  max-width: 50em;
-  border: 2px solid;
-  border-radius: 30px;
-}
 
 .introduction {
   font-size: 22px;
+}
+
+.previews {
+  display: flex;
+  flex-direction: row;
+
+  .preview {
+    flex-grow: 1;
+    flex-basis: 0;
+    min-width: 35%;
+    max-width: 50%;
+  }
 }

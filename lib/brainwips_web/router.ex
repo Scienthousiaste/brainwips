@@ -18,6 +18,9 @@ defmodule BrainwipsWeb.Router do
     pipe_through :browser
 
     get "/", HomeController, :home
+    get "/split_attention", SplitAttentionController, :split_attention
+    get "/memory_limits", MemoryLimitsController, :memory_limits
+
   end
 
   # Other scopes may use custom stacks.
