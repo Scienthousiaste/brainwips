@@ -5,18 +5,18 @@
 const select = (function () {
 
     function addClass(newClass) {
-        for (var i = 0; i < this.length; i++) {
+        for (let i = 0; i < this.length; i++) {
             this[i].className += ' ' + newClass;
         }
         return this;
     }
 
     function removeClass(classToRemove) {
-        for (var i = 0; i < this.length; i++) {
-            var oldClasses = this[i].className.split(' ');
-            var newClasses = [];
+        for (let i = 0; i < this.length; i++) {
+            const oldClasses = this[i].className.split(' ');
+            const newClasses = [];
 
-            for (var j = 0; j < oldClasses.length; j++) {
+            for (let j = 0; j < oldClasses.length; j++) {
                 if (oldClasses[j] !== classToRemove) {
                     newClasses.push(oldClasses[j]);
                 }
@@ -27,14 +27,14 @@ const select = (function () {
     }
 
     function changeText(newContent) {
-        for (var i = 0; i < this.length; i++) {
+        for (let i = 0; i < this.length; i++) {
             this[i].textContent = newContent;
         }
         return this;
     }
 
     function hide() {
-        for (var i = 0; i < this.length; i++) {
+        for (let i = 0; i < this.length; i++) {
             this[i].style.display = 'none';
         }
         return this;
@@ -42,12 +42,12 @@ const select = (function () {
 
     function show(str) {
         if (str) {
-            for (var i = 0; i < this.length; i++) {
+            for (let i = 0; i < this.length; i++) {
                 this[i].style.display = str;
             }
         }
         else {
-            for (var i = 0; i < this.length; i++) {
+            for (let i = 0; i < this.length; i++) {
                 this[i].style.display = 'block';
             }
         }
@@ -55,35 +55,30 @@ const select = (function () {
     }
 
     function on(event, foo) {
-        for (var i = 0; i < this.length; i++) {
+        for (let i = 0; i < this.length; i++) {
             this[i].addEventListener(event, foo);
         }
         return this;
     }
 
     function html(newContent) {
-        for (var i = 0; i < this.length; i++) {
+        for (let i = 0; i < this.length; i++) {
             this[i].innerHTML = newContent;
         }
         return this;
     }
 
     function addText(newContent) {
-        for (var i = 0; i < this.length; i++) {
+        for (let i = 0; i < this.length; i++) {
             this[i].textContent += newContent;
         }
         return this;
     }
 
-    function toggleClass(select) {
-        var elem = document.querySelector(select);
-    }
-
     function select(queryString) {
-        var selectedElems = document.querySelectorAll(queryString);
+        const selectedElems = document.querySelectorAll(queryString);
         selectedElems.addClass = addClass;
         selectedElems.removeClass = removeClass;
-        selectedElems.toggleClass = toggleClass;
         selectedElems.changeText = changeText;
         selectedElems.hide = hide;
         selectedElems.show = show;
