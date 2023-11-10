@@ -6,8 +6,6 @@ import select from "../utils/select";
     - give control to change all/most parameters
     - the styling is done through CSS classes, no change of the style property
     
-    Have a "focus" component, that will open a wide modal with the experience/simulation inside?
-
     To answer:
     - use non pixel units and draw simulation result on an HTML canvas?
 */
@@ -47,6 +45,78 @@ function addTarget(container) {
     container.appendChild(newTarget);
 }
 
+
+function initState() {
+
+    /*
+    - make and position + give orientation targets and distractors
+
+    */
+   return {}
+}
+
+
 export function initSplitAttention1() {
-    console.log("hi")
+    
+    const state = initState();
+    
+    draw(state);
+
+    // setUpCanvas();
+
+
+    // canvas = document.getElementsByClassName("canvas_hangman")[0];
+    // ctx = canvas.getContext('2d');
+    // ctx.translate(0.5, 0.5);
+}
+
+
+function strokeRectangle(cc, l, t, w, h) {
+    cc.ctx.strokeRect(
+        pToPx(cc.canvas, l, "w"),
+        pToPx(cc.canvas, t, "h"),
+        pToPx(cc.canvas, w, "w"),
+        pToPx(cc.canvas, h, "h")
+    )
+}
+
+function pToPx(canvas, p, dim) {
+    return Math.round(p * ((dim == "w") ? canvas.clientWidth : canvas.clientHeight));
+}
+
+function drawAreas(cc) {
+    // fillRect(x, y, width, height)
+    
+    // Draws a filled rectangle.
+    // strokeRect(x, y, width, height)
+    
+    // Draws a rectangular outline.
+
+    const areaParams = {
+        w: 0.15,
+        h: 0.7,
+        left: 0.25
+    }
+    areaParams.top = (1 - areaParams.h) / 2;
+
+    strokeRectangle(cc, 
+        areaParams.left, areaParams.top, areaParams.w, areaParams.h
+    )
+
+    strokeRectangle(cc, 
+        (1 - areaParams.left - areaParams.w),
+        areaParams.top,
+        areaParams.w,
+        areaParams.h
+    )
+
+}
+
+function draw(state) {
+    const canvas = select("canvas").elem;
+    canvas.width = canvas.clientWidth;
+    canvas.height = canvas.clientHeight;
+    const ctx = canvas.getContext('2d');
+
+    drawAreas({canvas: canvas, ctx: ctx});
 }
