@@ -85,6 +85,7 @@ const select = (function () {
         selectedElems.on = on;
         selectedElems.html = addText;
         selectedElems.addText = html;
+        selectedElems.elem = selectedElems[0];
 
         return (selectedElems);
     }

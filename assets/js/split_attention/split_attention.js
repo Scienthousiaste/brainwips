@@ -15,15 +15,6 @@ import select from "../utils/select";
 const TARGET_NUMBER = 3;
 const TARGET_RADIUS = 50;
 
-if (document.querySelector(".split-attention-page")) {
-    initSplitAttention();
-    select(".start-split-attention").on("click", onClickStartSplitAttention);
-}
-
-function onClickStartSplitAttention() {
-    alert("hi")
-}
-
 function initSplitAttention() {
     ["left", "right"].map(selectClass => addTargetsAndInit(selectClass));
 }
@@ -54,4 +45,8 @@ function addTarget(container) {
     newTarget.style.top = center.y + "px";
 
     container.appendChild(newTarget);
+}
+
+export function initSplitAttention1() {
+    console.log("hi")
 }
