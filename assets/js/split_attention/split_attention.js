@@ -1,122 +1,105 @@
 import select from "../utils/select";
 
 /*
-    Goal:
-    - create all the HTML elements in "experiments" from JS 
-    - give control to change all/most parameters
-    - the styling is done through CSS classes, no change of the style property
-    
-    To answer:
-    - use non pixel units and draw simulation result on an HTML canvas?
+    Target object:
+    - center - {x, y}, between 0 and 1
+    - isTarget - boolean
+    - direction - number between 0 and 2PI
 */
 
-const TARGET_NUMBER = 3;
-const TARGET_RADIUS = 50;
-
-function initSplitAttention() {
-    ["left", "right"].map(selectClass => addTargetsAndInit(selectClass));
-}
-
-function addTargetsAndInit(selectClass) {
-    const container = document.querySelector(".split-attention-page ." + selectClass);
-    for (let i = 0; i < TARGET_NUMBER; i++) {
-        addTarget(container);
-    }
-}
-
-function getRandomInt(min, max) {
-    return min + Math.floor(Math.random() * (max - min));
-}
-
-function addTarget(container) {
+function makeTarget(isTarget) {
     const center = {
-        x: getRandomInt(TARGET_RADIUS, container.clientWidth - TARGET_RADIUS),
-        y: getRandomInt(TARGET_RADIUS, container.clientHeight - TARGET_RADIUS)
+        x: Math.random(),
+        y: Math.random()
     }
-
-    //TODO : use my lib
-    const newTarget = document.createElement("div");
-    newTarget.setAttribute("class", "target");
-
-    // debugger
-    newTarget.style.left = center.x + "px";
-    newTarget.style.top = center.y + "px";
-
-    container.appendChild(newTarget);
+    return {
+        center: center,
+        isTarget: isTarget,
+        direction: Math.random * 2 * Math.PI
+    }
 }
 
+function makeAreaTargets(targetNumber, distractorNumber) {
+    const targets = [];
+    for (let i = 0; i < (targetNumber + distractorNumber); i++) {
+        targets.push(makeTarget(i < targetNumber));
+    }
+    return targets;
+}
 
 function initState() {
+    const targetNumber = 1;
+    const distractorNumber = 2;
+    const areaParams = {
+        w: 0.15,
+        h: 0.7,
+        left: 0.25
+    }
 
-    /*
-    - make and position + give orientation targets and distractors
+    areaParams.top = (1 - areaParams.h) / 2;
 
-    */
-   return {}
+    const leftArea = {
+        left: areaParams.left,
+        top: areaParams.top,
+        w: areaParams.w,
+        h: areaParams.h,
+        targets: makeAreaTargets(targetNumber, distractorNumber)
+    };
+    
+    const rightArea = {
+        left: (1 - areaParams.left - areaParams.w),
+        top: areaParams.top,
+        w: areaParams.w,
+        h: areaParams.h,
+        targets: makeAreaTargets(targetNumber, distractorNumber)
+    }
+
+    return {
+        left: leftArea,
+        right: rightArea
+    }
 }
-
 
 export function initSplitAttention1() {
-    
     const state = initState();
+    const canvas = select("canvas").elem;
+    canvas.width = canvas.clientWidth;
+    canvas.height = canvas.clientHeight;
+    const ctx = canvas.getContext('2d');
     
-    draw(state);
-
-    // setUpCanvas();
-
-
-    // canvas = document.getElementsByClassName("canvas_hangman")[0];
-    // ctx = canvas.getContext('2d');
-    // ctx.translate(0.5, 0.5);
+    draw({canvas: canvas, ctx: ctx}, state);
 }
 
-
-function strokeRectangle(cc, l, t, w, h) {
+function strokeRectangle(cc, area) {
     cc.ctx.strokeRect(
-        pToPx(cc.canvas, l, "w"),
-        pToPx(cc.canvas, t, "h"),
-        pToPx(cc.canvas, w, "w"),
-        pToPx(cc.canvas, h, "h")
+        pToPx(cc.canvas, area.left, "w"),
+        pToPx(cc.canvas, area.top, "h"),
+        pToPx(cc.canvas, area.w, "w"),
+        pToPx(cc.canvas, area.h, "h")
     )
+}
+
+function drawTargets({canvas: canvas, ctx: ctx}, area) {
+    const targetRadius = 0.02;
+
+    for (const target of area.targets) {
+        const x = pToPx(canvas, area.left + (target.center.x) * area.w, "w");
+        const y = pToPx(canvas, area.top + (target.center.y) * area.h, "h");
+
+        ctx.beginPath();
+        ctx.arc(x, y, pToPx(canvas, targetRadius, "w"), 0, 2* Math.PI);
+        ctx.fill();
+    }
 }
 
 function pToPx(canvas, p, dim) {
     return Math.round(p * ((dim == "w") ? canvas.clientWidth : canvas.clientHeight));
 }
 
-function drawAreas(cc) {
-    // fillRect(x, y, width, height)
-    
-    // Draws a filled rectangle.
-    // strokeRect(x, y, width, height)
-    
-    // Draws a rectangular outline.
-
-    const areaParams = {
-        w: 0.15,
-        h: 0.7,
-        left: 0.25
+function draw(cc, state) {
+    for (const prop in state) {
+        const area = state[prop];
+        strokeRectangle(cc, area);
+        drawTargets(cc, area);
     }
-    areaParams.top = (1 - areaParams.h) / 2;
-
-    strokeRectangle(cc, 
-        areaParams.left, areaParams.top, areaParams.w, areaParams.h
-    )
-
-    strokeRectangle(cc, 
-        (1 - areaParams.left - areaParams.w),
-        areaParams.top,
-        areaParams.w,
-        areaParams.h
-    )
-
-}
-
-function draw(state) {
-    const canvas = select("canvas").elem;
-    canvas.width = canvas.clientWidth;
-    canvas.height = canvas.clientHeight;
-    const ctx = canvas.getContext('2d');
-
-    drawAreas({canvas: canvas, ctx: ctx});
 }
