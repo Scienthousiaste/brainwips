@@ -1,25 +1,20 @@
 import select from "../utils/select";
 
 const TARGET_RADIUS = 0.02;
-
-
-/*
-    Target object:
-    - center - {x, y}, between 0 and 1
-    - isTarget - boolean
-    - direction - number between 0 and 2PI
-*/
+const TARGET_SPEED = 0.3;
+const REFRESH_TIME = 20;
 
 function makeTarget(indexCurrentStimuli, numberOfStimuli, isTarget) {
-    // by fixing the y coordinate, we won't have collisions
     const center = {
         x: Math.random(),
         y: (0.5 + indexCurrentStimuli) / numberOfStimuli
     }
+
+    const direction = Math.random() * 2 * Math.PI;
     return {
         center: center,
         isTarget: isTarget,
-        direction: Math.random * 2 * Math.PI
+        move: {dx: Math.cos(direction), dy: Math.sin(direction)}
     }
 }
 
@@ -81,7 +76,9 @@ export function initSplitAttention1() {
     canvas.height = canvas.clientHeight;
     const ctx = canvas.getContext('2d');
 
-    draw({ canvas: canvas, ctx: ctx }, state);
+    cc = { canvas: canvas, ctx: ctx };
+    draw(cc, state);
+    initInterval(cc, state);
 }
 
 function strokeRectangle(cc, area) {
@@ -117,4 +114,61 @@ function draw(cc, state) {
         strokeRectangle(cc, area);
         drawTargets(cc, area);
     }
+}
+
+function initInterval(cc, state) {
+    window.state = state;
+    window.lastIteration = Date.now();
+    window.splitAttention1Interval = setInterval(updateStateAndReDraw.bind(cc), REFRESH_TIME);
+}
+
+function updateStateAndReDraw() {
+    updateState(this.canvas);
+    
+    this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+    draw({canvas: this.canvas, ctx: this.ctx}, window.state);
+}
+
+function updateState(canvas) {
+    /* 
+    TODO:
+    - use requestAnimationFrame?
+    - use proper object oriented code instead of global variables everywhere
+    - collisions with other targets
+    */
+
+    const now = Date.now();
+    const delta = (now - window.lastIteration) / 1000;
+    const state = window.state;
+    const quotient = canvas.clientWidth / canvas.clientHeight; // to scale horizontal speed so that it's the same as vertical 
+
+    for (const prop in state) {
+        const area = state[prop];
+        for (const target of area.targets) {
+            let nextX = target.center.x + target.move.dx * delta * TARGET_SPEED * quotient;
+            let nextY = target.center.y + target.move.dy * delta * TARGET_SPEED;
+
+            if (nextX > 1) {
+                nextX = 1;
+                target.move.dx = target.move.dx * -1;
+            }
+            if (nextX < 0) {
+                nextX = 0;
+                target.move.dx = target.move.dx * -1;
+            }
+
+            if (nextY > 1) {
+                nextY = 1;
+                target.move.dy = target.move.dy * -1;
+            }
+            if (nextY < 0) {
+                nextY = 0;
+                target.move.dy = target.move.dy * -1;
+            }
+            target.center.x = nextX;
+            target.center.y = nextY;
+        }
+    }
+    window.lastIteration = now;
+    window.state = state;
 }
