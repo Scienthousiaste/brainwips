@@ -1,4 +1,5 @@
 import select from "../utils/select";
+import { allCombinationsOf2, distance } from "../utils/maths";
 
 const TARGET_RADIUS = 0.02;
 const TARGET_SPEED = 0.3;
@@ -129,12 +130,31 @@ function updateStateAndReDraw() {
     draw({canvas: this.canvas, ctx: this.ctx}, window.state);
 }
 
+function detectCollision(t1, t2) {
+    return (distance(t1.center, t2.center) < (TARGET_RADIUS * 2));
+}
+
+function dealWithPotentialCollision(combination) {
+    if (detectCollision(combination[0], combination[1])) {
+        
+        const saveX = combination[0].move.dx;
+        combination[0].move.dx = combination[1].move.dx;
+        combination[1].move.dx = saveX;
+
+        const saveY = combination[0].move.dy;
+        combination[0].move.dy = combination[1].move.dy;
+        combination[1].move.dy = saveY;
+    }
+}
+
 function updateState(canvas) {
     /* 
     TODO:
+    - recalibrer vitesse horizontale/verticale, y'a toujours un soucis
     - use requestAnimationFrame?
     - use proper object oriented code instead of global variables everywhere
     - collisions with other targets
+    - shouldn't recompute combinations every single time?
     */
 
     const now = Date.now();
@@ -148,6 +168,7 @@ function updateState(canvas) {
             let nextX = target.center.x + target.move.dx * delta * TARGET_SPEED * quotient;
             let nextY = target.center.y + target.move.dy * delta * TARGET_SPEED;
 
+            // Wall collisions
             if (nextX > 1) {
                 nextX = 1;
                 target.move.dx = target.move.dx * -1;
@@ -156,7 +177,6 @@ function updateState(canvas) {
                 nextX = 0;
                 target.move.dx = target.move.dx * -1;
             }
-
             if (nextY > 1) {
                 nextY = 1;
                 target.move.dy = target.move.dy * -1;
@@ -165,10 +185,28 @@ function updateState(canvas) {
                 nextY = 0;
                 target.move.dy = target.move.dy * -1;
             }
-            target.center.x = nextX;
-            target.center.y = nextY;
+
+            target.nextX = nextX;
+            target.nextY = nextY;
         }
     }
+
+    // target - target collisions
+    for (const prop in state) {
+        const area = state[prop];
+        for (const combination of allCombinationsOf2(area.targets)) {
+            dealWithPotentialCollision(combination);
+        }
+    } 
+
+    for (const prop in state) {
+        const area = state[prop];
+        for (const target of area.targets) {
+            target.center.x = target.nextX;
+            target.center.y = target.nextY;
+        }
+    }
+
     window.lastIteration = now;
     window.state = state;
 }
